@@ -3,12 +3,19 @@ package com.literatura.challenge_literatura.Principal;
 import com.literatura.challenge_literatura.model.DatosLibro;
 import com.literatura.challenge_literatura.model.Libro;
 import com.literatura.challenge_literatura.repository.LibroRepository;
+import com.literatura.challenge_literatura.service.ConsumoAPI;
+import com.literatura.challenge_literatura.service.ConvierteDatos;
 
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner teclado = new Scanner(System.in);
     private  LibroRepository repositorio;
+    private final String URL_BASE = "https://gutendex.com";
+    private ConsumoAPI consumoApi = new ConsumoAPI();
+    private ConvierteDatos conversor = new ConvierteDatos();
 
     public Principal(LibroRepository repository) {
         this.repositorio = repository;
@@ -46,11 +53,29 @@ public class Principal {
             }
         }
     }
+    private DatosLibro getDatosSerie() {
+        System.out.println("Escribe el título o autor del libro:");
+        String busqueda = teclado.nextLine();
+        String url = URL_BASE + busqueda.replace(" ", "%20");
+
+        String json = consumoApi.obtenerDatos(url); // Hace petición HTTP
+        DatosLibro datos = conversor.obtenerDatos(json, DatosLibro.class); // Convierte JSON en objeto
+        System.out.println("Resultado de la búsqueda:");
+        System.out.println(datos);
+        return datos;
+    }
+
 
     private void buscarLibroWeb() {
-//        DatosLibro datos = getDatosLibro();
+        DatosLibro datos = get;
 //        Libro serie = new Libro(datos);
 //        repositorio.save(serie);
 //        System.out.println(datos);
     }
+
+//    @Override
+//    public List<LibroDto> obtenerTodosLosLibros() {
+//        List<Libro> librosGuardados = libroRepository.findAll();
+//        return librosGuardados.stream().map(libro -> mapearADto(libro)).collect(Collectors.toList());
+//    }
 }

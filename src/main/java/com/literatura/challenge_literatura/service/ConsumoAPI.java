@@ -8,6 +8,7 @@ import java.net.http.HttpResponse;
 
 public class ConsumoAPI {
     public String obtenerDatos(String url){
+        System.out.println("la url: " + url);
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -22,6 +23,11 @@ public class ConsumoAPI {
             throw new RuntimeException(e);
         }
         String json = response.body();
+//        String jsonn = response.body().string();
+        System.out.println("Respuesta cruda de la API: " + json.strip());
+        if (json == null || json.isBlank()) {
+            throw new RuntimeException("La respuesta de la API está vacía");
+        }
         return json;
     }
 }

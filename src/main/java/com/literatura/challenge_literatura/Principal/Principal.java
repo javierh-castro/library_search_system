@@ -5,6 +5,7 @@ import com.literatura.challenge_literatura.model.Libro;
 import com.literatura.challenge_literatura.repository.LibroRepository;
 import com.literatura.challenge_literatura.service.ConsumoAPI;
 import com.literatura.challenge_literatura.service.ConvierteDatos;
+import com.literatura.challenge_literatura.service.RespuestaAPI;
 
 import java.util.List;
 import java.util.Scanner;
@@ -17,7 +18,14 @@ public class Principal {
     private ConsumoAPI consumoApi = new ConsumoAPI();
     private ConvierteDatos conversor = new ConvierteDatos();
 
+    private List<DatosLibros> datosLibros = new ArrayList<>();
+    private LibroRepository libroRepo;
+    private AutorRepository autorRepo;
+    private List<Libro> libros;
+    private Optional<Libro> libroBuscado;
+
     public Principal(LibroRepository repository) {
+
         this.repositorio = repository;
     }
 
@@ -53,29 +61,29 @@ public class Principal {
             }
         }
     }
-    private DatosLibro getDatosLibro() {
-        System.out.println("Escribe el título o autor del libro:");
-        String busqueda = teclado.nextLine();
-        String url = URL_BASE + busqueda.replace(" ", "%20");
+        private DatosLibro getDatosLibro() {
+            System.out.println("Escribe el título o autor del libro:");
+            String busqueda = teclado.nextLine();
+            String url = URL_BASE + "/books?search=" + busqueda.replace(" ", "+");
 
-        String json = consumoApi.obtenerDatos(url); // Hace petición HTTP
-        DatosLibro datos = conversor.obtenerDatos(json, DatosLibro.class); // Convierte JSON en objeto
-        System.out.println("Resultado de la búsqueda:");
-        System.out.println(datos);
-        return datos;
-    }
+            String json = consumoApi.obtenerDatos(url); // Hace petición HTTP
+            Datos respuesta  = conversor.obtenerDatos(json, Datos.class); // Convierte JSON en objeto
+            if (respuesta.results().isEmpty()) {
+                System.out.println("No se encontraron libros.");
+                return null;
+            }
+            DatosLibro datos = respuesta.results().get(0);
+            System.out.println("Resultado de la búsqueda:");
+            System.out.println(datos);
+            return datos;
+        }
 
 
     private void buscarLibroWeb() {
         DatosLibro datos = getDatosLibro();
+        if (datos == null) return;
         Libro libro = new Libro(datos);
         repositorio.save(libro);
-        System.out.println(datos);
+        System.out.println("Libro guardado!!!");
     }
-//    public Serie(DatosSerie datosSerie){
-//    @Override
-//    public List<LibroDto> obtenerTodosLosLibros() {
-//        List<Libro> librosGuardados = libroRepository.findAll();
-//        return librosGuardados.stream().map(libro -> mapearADto(libro)).collect(Collectors.toList());
-//    }
 }

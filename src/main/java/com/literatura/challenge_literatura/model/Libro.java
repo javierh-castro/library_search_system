@@ -10,7 +10,7 @@ public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-//    @Column(unique = true)
+    @Column(unique = true)
     private String title;
     private String languages;
     private String download_count;
@@ -25,17 +25,18 @@ public class Libro {
     // Constructor desde DatosLibro
     public Libro(DatosLibro datos) {
         this.title = datos.titulo();
-        this.download_count = String.valueOf(datos.descargas());
+        this.download_count = String.valueOf(datos.numeroDescargas());
 
         if (datos.lenguaje() != null && !datos.lenguaje().isEmpty()) {
             this.languages = String.join(", ", datos.lenguaje());
         }
 
-        if (datos.autores() != null) {
-            this.authors = datos.autores().stream()
+        if (datos.autor() != null) {
+            this.authors = datos.autor().stream()
                     .map(datoAutor -> {
                         Autor autor = new Autor();
-                        autor.setNombre(datoAutor.name());
+//                        autor.setNombre(datoAutor.name());
+                        autor.setNombre(datoAutor.nombre());
                         autor.setLibro(this); // clave para mantener la relación
                         return autor;
                     })

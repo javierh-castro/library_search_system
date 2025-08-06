@@ -1,13 +1,15 @@
 package com.literatura.challenge_literatura.Principal;
 
+import com.literatura.challenge_literatura.model.Datos;
 import com.literatura.challenge_literatura.model.DatosLibro;
 import com.literatura.challenge_literatura.model.Libro;
 import com.literatura.challenge_literatura.repository.LibroRepository;
 import com.literatura.challenge_literatura.service.ConsumoAPI;
 import com.literatura.challenge_literatura.service.ConvierteDatos;
-import com.literatura.challenge_literatura.service.RespuestaAPI;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -18,9 +20,9 @@ public class Principal {
     private ConsumoAPI consumoApi = new ConsumoAPI();
     private ConvierteDatos conversor = new ConvierteDatos();
 
-    private List<DatosLibros> datosLibros = new ArrayList<>();
+    private List<DatosLibro> datosLibros = new ArrayList<>();
     private LibroRepository libroRepo;
-    private AutorRepository autorRepo;
+//    private AutorRepository autorRepo;
     private List<Libro> libros;
     private Optional<Libro> libroBuscado;
 
@@ -68,11 +70,11 @@ public class Principal {
 
             String json = consumoApi.obtenerDatos(url); // Hace petición HTTP
             Datos respuesta  = conversor.obtenerDatos(json, Datos.class); // Convierte JSON en objeto
-            if (respuesta.results().isEmpty()) {
+            if (respuesta.resultados().isEmpty()) {
                 System.out.println("No se encontraron libros.");
                 return null;
             }
-            DatosLibro datos = respuesta.results().get(0);
+            DatosLibro datos = respuesta.resultados().get(0);
             System.out.println("Resultado de la búsqueda:");
             System.out.println(datos);
             return datos;

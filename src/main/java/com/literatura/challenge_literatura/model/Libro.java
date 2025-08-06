@@ -16,8 +16,32 @@ public class Libro {
     private String download_count;
 
     @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Transient
+//    @Transient
     private List<Autor> authors;
+
+    // Constructor vacío requerido por JPA
+    public Libro() {}
+
+    // Constructor desde DatosLibro
+    public Libro(DatosLibro datos) {
+        this.title = datos.titulo();
+        this.download_count = String.valueOf(datos.descargas());
+
+        if (datos.lenguaje() != null && !datos.lenguaje().isEmpty()) {
+            this.languages = String.join(", ", datos.lenguaje());
+        }
+
+        if (datos.autores() != null) {
+            this.authors = datos.autores().stream()
+                    .map(datoAutor -> {
+                        Autor autor = new Autor();
+                        autor.setNombre(datoAutor.name());
+                        autor.setLibro(this); // clave para mantener la relación
+                        return autor;
+                    })
+                    .toList();
+        }
+    }
 
     public Long getId() {
         return id;

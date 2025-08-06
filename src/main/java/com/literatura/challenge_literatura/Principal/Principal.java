@@ -53,7 +53,7 @@ public class Principal {
             }
         }
     }
-    private DatosLibro getDatosSerie() {
+    private DatosLibro getDatosLibro() {
         System.out.println("Escribe el título o autor del libro:");
         String busqueda = teclado.nextLine();
         String url = URL_BASE + busqueda.replace(" ", "%20");
@@ -67,12 +67,12 @@ public class Principal {
 
 
     private void buscarLibroWeb() {
-        DatosLibro datos = get;
-//        Libro serie = new Libro(datos);
-//        repositorio.save(serie);
-//        System.out.println(datos);
+        DatosLibro datos = getDatosLibro();
+        Libro libro = new Libro(datos);
+        repositorio.save(libro);
+        System.out.println(datos);
     }
-
+//    public Serie(DatosSerie datosSerie){
 //    @Override
 //    public List<LibroDto> obtenerTodosLosLibros() {
 //        List<Libro> librosGuardados = libroRepository.findAll();

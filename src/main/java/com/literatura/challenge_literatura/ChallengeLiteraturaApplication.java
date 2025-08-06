@@ -18,7 +18,6 @@ public class ChallengeLiteraturaApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("Hola putas");
 		Principal principal = new Principal(repository);
 		principal.muestraElMenu();
 	}

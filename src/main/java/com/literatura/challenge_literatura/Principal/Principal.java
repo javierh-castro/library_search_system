@@ -14,10 +14,11 @@ import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner teclado = new Scanner(System.in);
-    private  LibroRepository repositorio;
-    private final String URL_BASE = "https://gutendex.com";
+    private static final String URL_BASE = "https://gutendex.com";
     private ConsumoAPI consumoApi = new ConsumoAPI();
     private ConvierteDatos conversor = new ConvierteDatos();
+
+    private  LibroRepository repositorio;
 
     private List<DatosLibro> datosLibros = new ArrayList<>();
     private LibroRepository libroRepo;
@@ -65,7 +66,7 @@ public class Principal {
         private DatosLibro getDatosLibro() {
             System.out.println("Escribe el título o autor del libro:");
             String busqueda = teclado.nextLine();
-            String url = URL_BASE + "/books?search=" + busqueda.replace(" ", "+");
+            String url = URL_BASE + "/books/?search=" + busqueda.replace(" ", "%20");//Me falto el /
 
             String json = consumoApi.obtenerDatos(url); // Hace petición HTTP
             System.out.println("📦 Respuesta JSON cruda:\n" + json);
@@ -97,7 +98,7 @@ public class Principal {
                         .collect(Collectors.toList());
                 libro.setIdiomas(idiomasNormalizados);
             }
-            if(datos.autor()!= null ){
+              if(datos.autor()!= null ){
                 List<Autor> autores = datos.autor().stream()
                         .map(datoAutor -> autorRepo
                                 .findByNombre(datoAutor.nombre())

@@ -11,37 +11,54 @@ public class Libro {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true)
-    private String title;
-    private String languages;
-    private String download_count;
-
-    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @Transient
-    private List<Autor> authors;
+    private String titulo;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "libro_idiomas", joinColumns = @JoinColumn(name = "libro_id"))
+    @Column(name = "idioma")
+    private List<String> idiomas;
+    private Integer numeroDescargas;
+    //    @OneToMany(mappedBy = "libro", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "libro_autor",
+            joinColumns = @JoinColumn(name = "libro_id"),
+            inverseJoinColumns = @JoinColumn(name = "autor_id")
+    )
+    private List<Autor> autor;
 
     // Constructor vacío requerido por JPA
-    public Libro() {}
+    public Libro() {
+    }
 
     // Constructor desde DatosLibro
-    public Libro(DatosLibro datos) {
-        this.title = datos.titulo();
-        this.download_count = String.valueOf(datos.numeroDescargas());
+//    public Libro(DatosLibro datos) {
+//        this.titulo = datos.titulo();
+//        this.download_count = String.valueOf(datos.numeroDescargas());
+//
+//        if (datos.lenguaje() != null && !datos.lenguaje().isEmpty()) {
+//            this.languages = String.join(", ", datos.lenguaje());
+//        }
+//
+//        if (datos.autor() != null) {
+//            this.authors = datos.autor().stream()
+//                    .map(datoAutor -> {
+//                        Autor autor = new Autor();
+//                        autor.setNombre(datoAutor.nombre());
+//                        autor.setLibro(this); // clave para mantener la relación
+//                        return autor;
+//                    })
+//                    .toList();
+//        }
+//    }
+    public Libro(DatosLibro datosLibros) {
+        this.titulo = datosLibros.titulo();
+        this.idiomas = datosLibros.idiomas();
+        this.numeroDescargas = datosLibros.numeroDescargas();
 
-        if (datos.lenguaje() != null && !datos.lenguaje().isEmpty()) {
-            this.languages = String.join(", ", datos.lenguaje());
-        }
+    }
 
-        if (datos.autor() != null) {
-            this.authors = datos.autor().stream()
-                    .map(datoAutor -> {
-                        Autor autor = new Autor();
-//                        autor.setNombre(datoAutor.name());
-                        autor.setNombre(datoAutor.nombre());
-                        autor.setLibro(this); // clave para mantener la relación
-                        return autor;
-                    })
-                    .toList();
-        }
+    public void setAutor(List<Autor> autores) {
+        this.autor = autores;
     }
 
     public Long getId() {
@@ -52,35 +69,31 @@ public class Libro {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
-    public String getLanguages() {
-        return languages;
+    public List<String> getIdiomas() {
+        return idiomas;
     }
 
-    public void setLanguages(String languages) {
-        this.languages = languages;
+    public void setIdiomas(List<String> idiomas) {
+        this.idiomas = idiomas;
     }
 
-    public String getDownload_count() {
-        return download_count;
+    public Integer getNumeroDescargas() {
+        return numeroDescargas;
     }
 
-    public void setDownload_count(String download_count) {
-        this.download_count = download_count;
+    public void setNumeroDescargas(Integer numeroDescargas) {
+        this.numeroDescargas = numeroDescargas;
     }
 
-    public List<Autor> getAuthors() {
-        return authors;
-    }
-
-    public void setAuthors(List<Autor> authors) {
-        this.authors = authors;
+    public List<Autor> getAutor() {
+        return autor;
     }
 }

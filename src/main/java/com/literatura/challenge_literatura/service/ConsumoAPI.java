@@ -17,17 +17,15 @@ public class ConsumoAPI {
         try {
             response = client
                     .send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
+        } catch (IOException  e) {
+            System.out.println("Error al enviar solicitud HTTP: " + e.getMessage());
+            e.printStackTrace(); // <-- Agregá esto para ver más detalles
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         String json = response.body();
-//        String jsonn = response.body().string();
         System.out.println("Respuesta cruda de la API: " + json.strip());
-        if (json == null || json.isBlank()) {
-            throw new RuntimeException("La respuesta de la API está vacía");
-        }
         return json;
     }
 }

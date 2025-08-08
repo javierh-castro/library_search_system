@@ -1,16 +1,15 @@
 package com.literatura.challenge_literatura.Principal;
 
+import com.literatura.challenge_literatura.model.Autor;
 import com.literatura.challenge_literatura.model.Datos;
 import com.literatura.challenge_literatura.model.DatosLibro;
 import com.literatura.challenge_literatura.model.Libro;
+import com.literatura.challenge_literatura.repository.AutoRepository;
 import com.literatura.challenge_literatura.repository.LibroRepository;
 import com.literatura.challenge_literatura.service.ConsumoAPI;
 import com.literatura.challenge_literatura.service.ConvierteDatos;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Principal {
@@ -22,7 +21,7 @@ public class Principal {
 
     private List<DatosLibro> datosLibros = new ArrayList<>();
     private LibroRepository libroRepo;
-//    private AutorRepository autorRepo;
+    private AutoRepository autorRepo;
     private List<Libro> libros;
     private Optional<Libro> libroBuscado;
 
@@ -69,23 +68,47 @@ public class Principal {
             String url = URL_BASE + "/books?search=" + busqueda.replace(" ", "+");
 
             String json = consumoApi.obtenerDatos(url); // Hace petición HTTP
+            System.out.println("📦 Respuesta JSON cruda:\n" + json);
             Datos respuesta  = conversor.obtenerDatos(json, Datos.class); // Convierte JSON en objeto
+            System.out.println("¿Respuesta nula? " + (respuesta == null));
+            System.out.println("¿Resultados nulos? " + (respuesta != null && respuesta.resultados() == null));
             if (respuesta.resultados().isEmpty()) {
                 System.out.println("No se encontraron libros.");
                 return null;
             }
-            DatosLibro datos = respuesta.resultados().get(0);
-            System.out.println("Resultado de la búsqueda:");
-            System.out.println(datos);
-            return datos;
+            return respuesta.resultados().get(0);
         }
 
 
     private void buscarLibroWeb() {
         DatosLibro datos = getDatosLibro();
         if (datos == null) return;
-        Libro libro = new Libro(datos);
-        repositorio.save(libro);
-        System.out.println("Libro guardado!!!");
+        Optional<Libro> libroExistente = libroRepo.findByTituloContainsIgnoreCase(datos.titulo());
+        if (libroExistente.isPresent()) {
+            System.out.println("⚠️ El libro \"" + datos.titulo() + "\" ya está almacenado en la base de datos.");
+            System.out.println(libroExistente.get());
+        } else {
+            Libro libro = new Libro(datos);
+            libroRepo.save(libro);
+            if (datos.idiomas() != null) {
+                List<String> idiomasNormalizados = datos.idiomas().stream()
+                        .map(String::toLowerCase)
+                        .distinct()
+                        .collect(Collectors.toList());
+                libro.setIdiomas(idiomasNormalizados);
+            }
+            if(datos.autor()!= null ){
+                List<Autor> autores = datos.autor().stream()
+                        .map(datoAutor -> autorRepo
+                                .findByNombre(datoAutor.nombre())
+                                .orElseGet(() -> autorRepo.save(new Autor(datoAutor)))
+                        )
+                        .collect(Collectors.toList());
+                libro.setAutor(autores);
+                autores.forEach(a -> a.setLibros(List.of(libro)));
+            }
+            System.out.println("✅ Libro guardado correctamente:");
+            System.out.println(libro);
+        }
     }
 }

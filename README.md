@@ -1,4 +1,4 @@
-    # 📚 Sistema de Gestión de Libros
+# 📚 Sistema de Gestión de Libros
 
 Proyecto desarrollado en **Java** con **Spring Boot** y **PostgreSQL**, que consume la API pública [Gutendex](https://gutendex.com) para buscar y gestionar información de libros.
 
